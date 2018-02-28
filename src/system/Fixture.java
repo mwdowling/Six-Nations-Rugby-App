@@ -53,7 +53,7 @@ import java.util.List;
 public final class Fixture {
 	
 	//6 teams in random order
-	private  String[] ShuffledTeams = new String[6];
+	private String[] ShuffledTeams = new String[6];
 	
 	//15 matches
 	private final String[] Match01 = {ShuffledTeams[0], ShuffledTeams[1]};
