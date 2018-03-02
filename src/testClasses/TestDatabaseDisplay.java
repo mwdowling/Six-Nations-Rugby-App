@@ -22,8 +22,7 @@ import java.sql.Statement;
 public class TestDatabaseDisplay {
 
 	public static void main(String[] args) {
-
-		
+	
 		//initialise connection, statement, and resultSet for League Table Query
 		try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://C:/Users/Martin/My Documents/Java Projects/SixNationsApp/Six Nations 2018.accdb");){
 			try(Statement s = conn.createStatement();){

@@ -25,10 +25,10 @@ public class LeagueTable {
 	private Team A;
 	private Team B;
 
-	public LeagueTable(ResultsTable mr) {
+	public LeagueTable(ResultsTable mr, Team a, Team b) {
 		MR = mr;
-		A = new TeamA(MR.ReturnResult()[1], MR.ReturnResult()[2], MR.ReturnResult()[3]);
-		B = new TeamB(MR.ReturnResult()[3], MR.ReturnResult()[4], MR.ReturnResult()[1]);
+		A = a;
+		B = b;
 	}
 
 	public void WriteMatchUpdate() {
