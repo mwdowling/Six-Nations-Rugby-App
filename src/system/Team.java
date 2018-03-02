@@ -4,18 +4,23 @@ package system;
  * @author Martin Dowling
  * 
  * Abstract model of the behaviour of a team.
- * A method for everything a team does which has a persistent result.
+ * One method for everything a team gets from a match
+ * that is used to create database data.
+ * 
  */
 
-import java.util.ArrayList;
-
 public interface Team {
+	
+	//override located in concrete TeamA and TeamB
+	int TeamNo (int matchID);
+	int[] UpdateResults(ResultsTable rt, int[] leagueTableArray, Result r, int matchPointsNew);
+	
+	//overrides located in TeamAbstract
+	int[] ResultsCurrent(ResultsTable rt);
+	Result ResultNew();
+	int MatchPointsNew(Result r); 
+	int GrandSlam(int wins);
 
-	String PlayedAgainst(String string);
-	int ScoredPoints(int points);
-	int ConcededPoints(int points);
-	int ScoredTries(int tries);
-	Result GotResult();
-	int AddedMatchPoints (int pointsScored, int pointsConceded, int tries);
-	int grandSlam(ArrayList<Result> results); 
+
+	
 }

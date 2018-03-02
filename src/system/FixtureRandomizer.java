@@ -12,12 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  */
 public class FixtureRandomizer {
-	
-	private final String[] Teams = {"England", "France", "Ireland", "Italia", "Scotland", "Wales"};
 		
-	public FixtureRandomizer() {
-		
-	}
+	public FixtureRandomizer() { }
 
 	// the shuffling method adapted from StackOverflow
 	public String[] Shuffle(String[] array) {
@@ -33,11 +29,4 @@ public class FixtureRandomizer {
 		}
 		return array;
 	}
-	
-	public void Saved(String[] array) {
-		System.out.println(array);
-
-		
-	}
-
 }
