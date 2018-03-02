@@ -1,7 +1,8 @@
-package system;
+package testClasses;
 
 /**
  * @author Martin Dowling
+
  * 
  * A main method class which does the following: 
  * 
@@ -16,7 +17,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+
+import system.FixtureRandomizer;
 
 public class TestDatabaseTeamNoAssignment {
 

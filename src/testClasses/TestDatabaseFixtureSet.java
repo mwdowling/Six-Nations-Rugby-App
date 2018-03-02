@@ -1,4 +1,4 @@
-package system;
+package testClasses;
 
 /**
  * @author Martin Dowling
@@ -97,6 +97,7 @@ public class TestDatabaseFixtureSet {
 		//update the six teams in the League Table
 		String update3 = "UPDATE [League Table] SET TeamName = ? WHERE TeamNo = ?";
 		for (int i = 0; i < 6; i++) {
+
 			try (Connection conn = DriverManager
 					.getConnection("jdbc:ucanaccess://C:/Users/Martin/My Documents/Java Projects/SixNationsApp/Six Nations 2018.accdb");) {
 				try (PreparedStatement s = conn.prepareStatement(update3);) {
