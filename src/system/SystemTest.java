@@ -10,14 +10,14 @@ public class SystemTest {
 		int BPoints = 7; 
 		int BTries = 1;
 		
-		ResultsTable rt = new ResultsTable(MatchID, APoints, ATries, BPoints, BTries);
-		rt.WriteResult();
+		ResultsTable resultsTable = new ResultsTable(MatchID, APoints, ATries, BPoints, BTries);
+		resultsTable.WriteResult();
 		
-		Team A = new TeamA(rt.ReturnResult()[1], rt.ReturnResult()[2], rt.ReturnResult()[3]);
-		Team B = new TeamB(rt.ReturnResult()[3], rt.ReturnResult()[4], rt.ReturnResult()[1]);
+		Team A = new TeamA(resultsTable.ReturnResult()[1], resultsTable.ReturnResult()[2], resultsTable.ReturnResult()[3]);
+		Team B = new TeamB(resultsTable.ReturnResult()[3], resultsTable.ReturnResult()[4], resultsTable.ReturnResult()[1]);
 
-		LeagueTable lt = new LeagueTable(rt, A, B);
-		lt.WriteMatchUpdate();
+		LeagueTable leagueTable = new LeagueTable(resultsTable, A, B);
+		leagueTable.WriteMatchUpdate();
 		
 		
 	}
