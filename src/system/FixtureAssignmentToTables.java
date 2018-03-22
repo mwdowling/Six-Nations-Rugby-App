@@ -2,9 +2,13 @@ package system;
 
 /**
  * @author Martin Dowling
- *  A class that returns an object which
- * populates the Results Table and League Table
- * with appropriate team names assigned to team numbers
+ * 
+ * A blueprint fot an object that
+ * populates the Results Table and League Table in the Database
+ * with the team names that have been randomly 
+ * assigned to team numbers
+ * 
+ * @see FixtureAssignment
  */
 
 
@@ -28,8 +32,7 @@ public class FixtureAssignmentToTables {
 	public void Assign() {
 
 		// Get the Shuffled Team List from the Database
-		try (Connection conn = DriverManager
-				.getConnection("jdbc:ucanaccess://C:/Users/Martin/My Documents/Six Nations 2018.accdb");) {
+		try (Connection conn = new DatabaseConnection().Maker();) {
 			try (Statement s = conn.createStatement();) {
 				try (ResultSet rs = s.executeQuery("SELECT * FROM [Fixture Assignment]");) {
 					// write the resultSet to an array
@@ -55,8 +58,7 @@ public class FixtureAssignmentToTables {
 		// update the names of Team1 in each match
 		String update1 = "UPDATE Results SET Team1Name = ? WHERE Team1No = ?";
 		for (int i = 0; i < 6; i++) {
-			try (Connection conn = DriverManager.getConnection(
-					"jdbc:ucanaccess://C:/Users/Martin/My Documents/Java Project/SixNationsApp/Six Nations 2018.accdb");) {
+			try (Connection conn = new DatabaseConnection().Maker();) {
 				try (PreparedStatement s = conn.prepareStatement(update1);) {
 					s.setString(1, TeamsShuffled.get(i));
 					s.setInt(2, i + 1);
@@ -77,8 +79,7 @@ public class FixtureAssignmentToTables {
 		// update the names of Team2 in each match
 		String update2 = "UPDATE Results SET Team2Name = ? WHERE Team2No = ?";
 		for (int i = 0; i < 6; i++) {
-			try (Connection conn = DriverManager
-					.getConnection("jdbc:ucanaccess://C:/Users/Martin/My Documents/Six Nations 2018.accdb");) {
+			try (Connection conn = new DatabaseConnection().Maker();) {
 				try (PreparedStatement s = conn.prepareStatement(update2);) {
 					s.setString(1, TeamsShuffled.get(i));
 					s.setInt(2, i + 1);
@@ -97,11 +98,10 @@ public class FixtureAssignmentToTables {
 		} // end for loop
 
 		// update the six teams in the League Table
-		String update3 = "UPDATE [League Table] SET TeamName = ? WHERE TeamNo = ?";
+		String update3 = "UPDATE [League Table] SET [Team Name] = ? WHERE [Team Number] = ?";
 		for (int i = 0; i < 6; i++) {
 
-			try (Connection conn = DriverManager.getConnection(
-					"jdbc:ucanaccess://C:/Users/Martin/My Documents/Java Projects/SixNationsApp/Six Nations 2018.accdb");) {
+			try (Connection conn = new DatabaseConnection().Maker();) {
 				try (PreparedStatement s = conn.prepareStatement(update3);) {
 					s.setString(1, TeamsShuffled.get(i));
 					s.setInt(2, i + 1);

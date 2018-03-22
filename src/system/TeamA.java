@@ -1,10 +1,27 @@
 package system;
 
+/**
+ * 
+ * @author Martin Dowling
+ * 
+ * For a given match, this object will 
+ * identify itself as Team 1 in that match
+ * and create the values for Team 1 in an array
+ * for loading into the League Table
+ * as well as inheriting the behaviours of an abstract team
+ * 
+ * @see TeamAbstract
+ */
+
 public class TeamA extends TeamAbstract {
 	
-	//TODO no need for team number in constructor
-	public TeamA(int pointsScored, int tries, int pointsConceded) {
-		super(pointsScored, tries, pointsConceded);		
+	private Results R;
+	private int Row;
+	
+	public TeamA(Results results, int row, int pointsScored, int tries, int pointsConceded) {
+		super(results, row, pointsScored, tries, pointsConceded);	
+		R = results;
+		Row = row;
 	}
 	
 	@Override
@@ -35,26 +52,26 @@ public class TeamA extends TeamAbstract {
 	}
 	
 	@Override
-	public int[] UpdateResults(ResultsTable rt, int[] leagueTableArray, Result r, int matchPointsNew) {
+	public int[] UpdateResults(int[] leagueTableArray, Result r, int matchPointsNew) {
 
-		leagueTableArray[1]++;// add another game played
+		leagueTableArray[0]++;// add another game played
 
 		// update wins, losses, and draws
 		switch (r) {
 
-		case WIN: {leagueTableArray[2]++;} break;
-		case LOSS: {leagueTableArray[3]++;} break;
-		case DRAW: {leagueTableArray[4]++;}
+		case WIN: {leagueTableArray[1]++;} break;
+		case LOSS: {leagueTableArray[2]++;} break;
+		case DRAW: {leagueTableArray[3]++;}
 
 		}
 
 		// update points scored, points conceded, and tries
-		leagueTableArray[5] = leagueTableArray[5] + rt.ReturnResult()[1];
-		leagueTableArray[6] = leagueTableArray[6] + rt.ReturnResult()[3];
-		leagueTableArray[7] = leagueTableArray[7] + rt.ReturnResult()[2];
+		leagueTableArray[4] = leagueTableArray[4] + R.ReturnResult()[Row][1];
+		leagueTableArray[5] = leagueTableArray[5] + R.ReturnResult()[Row][3];
+		leagueTableArray[6] = leagueTableArray[6] + R.ReturnResult()[Row][2];
 
 		// update bonus points
-		leagueTableArray[8] = leagueTableArray[8] + matchPointsNew;
+		leagueTableArray[7] = leagueTableArray[7] + matchPointsNew;
 
 		return leagueTableArray;
 	}

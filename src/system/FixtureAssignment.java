@@ -2,23 +2,26 @@ package system;
 
 /**
  * @author Martin Dowling
+
  * 
- * A class that returns an object which
- * populates the Fixture Assignment table
+ * A blueprint for an object that
+ * populates the Fixture Assignment table in the Database
  * with randomly shuffled team names
  */
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FixtureAssignment {
 
-	private final String[] Teams = { "England", "France", "Ireland", "Italia", "Scotland", "Wales" };
-	private String[] TeamsShuffled;
+	private List<String> TeamsShuffled = new ArrayList<String>();
 
-	public FixtureAssignment(String[] teamsShuffled, FixtureRandomizer fr) {
-		TeamsShuffled = fr.Shuffle(Teams);
+
+	public FixtureAssignment(ArrayList<String> teamsShuffled) {
+		TeamsShuffled = teamsShuffled;
+
 	}
 
 	public void AssignTeams() {
@@ -27,11 +30,10 @@ public class FixtureAssignment {
 
 		for (int i = 1; i <= 6; i++) {
 
-			try (Connection conn = DriverManager
-					.getConnection("jdbc:ucanaccess://C:/Users/Martin/My Documents/Six Nations.accdb");) {
+			try (Connection conn = new DatabaseConnection().Maker()) {
 				try (PreparedStatement s = conn.prepareStatement(myStatement);) {
 					s.setInt(1, i);
-					s.setString(2, TeamsShuffled[i - 1]);
+					s.setString(2, TeamsShuffled.get(i-1));
 					s.executeUpdate();
 					s.close();
 				} catch (SQLException e) {
@@ -43,6 +45,7 @@ public class FixtureAssignment {
 			} catch (SQLException e) {
 				System.out.println("Error with Connection.");
 				e.printStackTrace();
+				//TODO pass this exception up to the GUI?
 			}
 		} // end for loop
 	}

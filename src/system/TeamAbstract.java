@@ -1,48 +1,53 @@
 package system;
 
+/**
+ * @author Martin Dowling
+ * 
+ * An abstract class with implementations of interface behaviours. 
+ * The opposing teams in each match 
+ * inherit these attributes and behaviours.
+ * 
+ */
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * @author Martin Dowling
- * 
- *         An abstract class with implementations of interface behaviours. The
- *         opposing teams in each match will inherit these attributes and
- *         behaviours.
- * 
- */
-
 public abstract class TeamAbstract implements Team {
 
+	private int MatchID;
 	private int PointsScored;
 	private int Tries;
 	private int PointsConceded;
 	private int MatchPoints;
 
-	public TeamAbstract(int pointsScored, int tries, int pointsConceded) {
+	public TeamAbstract(Results results, int row, int pointsScored, int tries, int pointsConceded) {
+		
 		PointsScored = pointsScored;
 		Tries = tries;
 		PointsConceded = pointsConceded;
+		MatchID = results.ReturnResult()[row][0];
+		
 	}
 
 	@Override
-	public int[] ResultsCurrent(ResultsTable rt) {
+	public int[] ResultsCurrent() {
 
 		int[] leagueTableArray = new int[9];
 
-		try (Connection conn = DriverManager.getConnection(
-				"jdbc:ucanaccess://C:/Users/Martin/My Documents/Java Projects/SixNationsApp/Six Nations 2018.accdb");) {
+		try (Connection conn = new DatabaseConnection().Maker();) {
 			try (Statement s = conn.createStatement();) {
-				try (ResultSet rs = s.executeQuery("SELECT * FROM [League Table Update] WHERE [Team Number] = "
-						+ this.TeamNo(rt.ReturnResult()[0]))) {
-
+				try (ResultSet rs = s.executeQuery("SELECT [Games Played], Wins, Losses, Draws, Scored, Conceded, Tries, [Grand Slam], Points FROM [League Table] WHERE [Team Number] = "
+						+ this.TeamNo(MatchID))) {
+					System.out.println("Match: " + MatchID);
+					System.out.println("Team No: " + this.TeamNo(MatchID));
 					// load resultSet into the array
 					rs.next();
+					
 					for (int i = 0; i < leagueTableArray.length; i++) {
-						leagueTableArray[i] = rs.getInt(i + 1);
+						
+						leagueTableArray[i] = rs.getInt(i+1);
 					}
 
 				} catch (SQLException e) {
@@ -74,9 +79,11 @@ public abstract class TeamAbstract implements Team {
 			thisResult = Result.DRAW;
 
 		} else if (PointsScored > PointsConceded) {
+			
 			thisResult = Result.WIN;
 
 		} else
+			
 			thisResult = Result.LOSS;
 
 		return thisResult;

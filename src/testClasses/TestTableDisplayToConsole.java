@@ -19,7 +19,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class TestDatabaseDisplay {
+public class TestTableDisplayToConsole {
 
 	public static void main(String[] args) {
 	

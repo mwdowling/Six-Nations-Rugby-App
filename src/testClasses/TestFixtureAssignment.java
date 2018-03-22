@@ -17,31 +17,34 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import system.DatabaseConnection;
 import system.FixtureRandomizer;
 
-public class TestDatabaseTeamNoAssignment {
+public class TestFixtureAssignment {
 
 	public static void main(String[] args) {
 
 		final String[] Teams = { "England", "France", "Ireland", "Italia", "Scotland", "Wales" };
-		String[] TeamsShuffled;
+		List<String> TeamsShuffled = new ArrayList<String>();
 		FixtureRandomizer fr = new FixtureRandomizer();
-		TeamsShuffled = fr.Shuffle(Teams);
+		TeamsShuffled = Arrays.asList(fr.Shuffle(Teams));
 
-		for (int i = 0; i < TeamsShuffled.length; i++) {
-			System.out.print(TeamsShuffled[i] + ", ");
+		for (int i = 0; i < TeamsShuffled.size(); i++) {
+			System.out.print(TeamsShuffled.get(i) + ", ");
 		}
-
+		
 		String myStatement = "INSERT INTO [Fixture Assignment] ([Team Number], [Team Name]) VALUES(?,?)";
 		
 		for (int i = 1; i <= 6; i++) {
 
-			try (Connection conn = DriverManager
-					.getConnection("jdbc:ucanaccess://C:/Users/Martin/My Documents/Six Nations.accdb");) {
+			try (Connection conn = new DatabaseConnection().Maker()) {
 				try (PreparedStatement s = conn.prepareStatement(myStatement);) {
 					s.setInt(1, i);
-					s.setString(2, TeamsShuffled[i - 1]);
+					s.setString(2, TeamsShuffled.get(i-1));
 					s.executeUpdate();
 					s.close();
 				} catch (SQLException e) {

@@ -6,14 +6,18 @@ import java.util.concurrent.ThreadLocalRandom;
  * 
  * @author Martin Dowling
  * 
- * A class that returns an object that 
- * takes an array of TeamNames 
- * and randomly "shuffles" its elements
+ * A blueprint for an object that 
+ * takes an array of team names  
+ * and randomly "shuffles" them
+ * 
+ * @see FixtureAssignment
  *
  */
 public class FixtureRandomizer {
+	
+	public FixtureRandomizer() { 
 		
-	public FixtureRandomizer() { }
+	}
 
 	// the shuffling method adapted from StackOverflow
 	public String[] Shuffle(String[] array) {

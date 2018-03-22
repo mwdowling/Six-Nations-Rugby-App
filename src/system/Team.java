@@ -13,10 +13,10 @@ public interface Team {
 	
 	//override located in concrete TeamA and TeamB
 	int TeamNo (int matchID);
-	int[] UpdateResults(ResultsTable rt, int[] leagueTableArray, Result r, int matchPointsNew);
+	int[] UpdateResults(int[] leagueTableArray, Result r, int matchPointsNew);
 	
 	//overrides located in TeamAbstract
-	int[] ResultsCurrent(ResultsTable rt);
+	int[] ResultsCurrent();
 	Result ResultNew();
 	int MatchPointsNew(Result r); 
 	int GrandSlam(int wins);
