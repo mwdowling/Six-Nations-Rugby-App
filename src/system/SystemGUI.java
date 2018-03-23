@@ -59,7 +59,6 @@ public class SystemGUI {
 
 	// text fields in the panels
 	private JTextField MatchNumberTextField;
-	private JTextField RoundNumberTextField;
 	private JTextField Team1PointsTextField;
 	private JTextField Team1TriesTextField;
 	private JTextField Team2PointsTextField;
@@ -74,6 +73,7 @@ public class SystemGUI {
 	String RoundResultFile = "";
 	String RoundResult = "";
 	int MatchID = 0;
+	private JButton btnHomeFromSearch;
 
 	// Application constructor with its huge initialize method (see below)
 	public SystemGUI() {
@@ -114,7 +114,6 @@ public class SystemGUI {
 		JPEnterMatchResult = new JPanel();
 		JPView = new JPanel();
 		JPSearch = new JPanel();
-		
 
 		// add the panels to the frame
 		frame.getContentPane().add(JPWelcome);
@@ -122,10 +121,7 @@ public class SystemGUI {
 		frame.getContentPane().add(JPEnterMatchResult);
 		frame.getContentPane().add(JPView);
 		frame.getContentPane().add(JPSearch);
-		
-		
 
-		
 		// CODE FOR WELCOME PANEL
 
 		// Welcome panel layout, label and buttons
@@ -136,84 +132,35 @@ public class SystemGUI {
 		lblWelcome.setBounds(60, 12, 769, 64);
 		JPWelcome.add(lblWelcome);
 
-		// Set Fixture button on Welcome panel makes SetFixture panel visible
+		// Set Fixture button on Welcome panel sets the randomly generated fixture
 		JButton btnWelcomeSetFixture = new JButton("Set Fixture");
 		btnWelcomeSetFixture.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		btnWelcomeSetFixture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				// TODO Warning message to prevent overwrite
-
 				// Shuffle teams and assign to team numbers
 				FixtureRandomizer fr = new FixtureRandomizer();
 				TeamsShuffled = new ArrayList<String>(Arrays.asList(fr.Shuffle(Teams)));
 				FixtureAssignment fa = new FixtureAssignment(TeamsShuffled);
+				
+				/*
+				 * TODO make the SQL Exception thrown by Fixture Assignment
+				 * when attempting to overwrite the table 
+				 * visible here
+				 */
 				fa.AssignTeams();
 
-				// Write assigned times to values in Results Table and League
-				// Table
+				// Assigned teams in Results Table and League Table
 				FixtureAssignmentToTables fatt = new FixtureAssignmentToTables((ArrayList<String>) TeamsShuffled);
 				fatt.Assign();
 
 				// Display Fixture Assignment Table
-				try (Connection conn = new DatabaseConnection().Maker();) {
-					try (Statement s = conn.createStatement();) {
-						try (ResultSet rs = s.executeQuery("SELECT * FROM [Fixture Assignment]");) {
-							ResultSetMetaData rsmd = rs.getMetaData();
-
-							String[] columns = new String[2];
-							for (int i = 0; i < columns.length; i++) {
-								columns[i] = rsmd.getColumnName(i + 1);
-							}
-
-							ArrayList<String[]> rows = new ArrayList<String[]>();
-							while (rs.next()) {
-								String[] row = new String[2];
-								for (int i = 0; i < row.length; i++) {
-									row[i] = rs.getString(i + 1);
-								}
-								;
-								rows.add(row);
-							}
-
-							String[][] data = new String[6][2];
-							for (int r = 0; r < rows.size(); r++) {
-								for (int c = 0; c < columns.length; c++) {
-
-									data[r][c] = rows.get(r)[c];
-								}
-							}
-							JTable table = new JTable(data, columns);
-							JScrollPane scrollPane = new JScrollPane(table);
-							table.setFillsViewportHeight(true);
-
-							JLabel lblHeading = new JLabel("Team Assignments");
-
-							final JFrame frame = new JFrame();
-							frame.getContentPane().setLayout(new BorderLayout());
-
-							frame.getContentPane().add(lblHeading, BorderLayout.PAGE_START);
-							frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-
-							// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-							frame.setSize(550, 200);
-							frame.setVisible(true);
-
-						} catch (SQLException e1) {
-							System.out.println("ResultSet Error.");
-							e1.printStackTrace();
-						}
-					} catch (SQLException e1) {
-						System.out.println("Statement Error.");
-						e1.printStackTrace();
-					}
-				} catch (SQLException e1) {
-					System.out.println("Connection Error.");
-					e1.printStackTrace();
-				}
-
+				DatabaseTable FixtureAssignmentTable = new DatabaseTable("SELECT * FROM [Fixture Assignment]");
+				FixtureAssignmentTable.Display();
+				
 			}
 		});
+
 		btnWelcomeSetFixture.setBounds(328, 110, 233, 61);
 		JPWelcome.add(btnWelcomeSetFixture);
 
@@ -221,6 +168,7 @@ public class SystemGUI {
 		JButton btnWelcomeEnterResults = new JButton("Enter Results");
 		btnWelcomeEnterResults.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		btnWelcomeEnterResults.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
 				JPWelcome.setVisible(false);
 				JPEnterResults.setVisible(true);
@@ -230,20 +178,27 @@ public class SystemGUI {
 		btnWelcomeEnterResults.setBounds(306, 213, 278, 61);
 		JPWelcome.add(btnWelcomeEnterResults);
 
-		// ViewSearch button on Welcome panel makes ViewSearch panel visible
-		JButton btnWelcomeViewSearch = new JButton("View Results ");
-		btnWelcomeViewSearch.setFont(new Font("Tahoma", Font.PLAIN, 42));
-		btnWelcomeViewSearch.addActionListener(new ActionListener() {
+		// View Results button on Welcome panel makes View panel visible
+		JButton btnWelcomeViewResults = new JButton("View Results");
+		btnWelcomeViewResults.setFont(new Font("Tahoma", Font.PLAIN, 42));
+		btnWelcomeViewResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JPView.setVisible(true);
 				JPWelcome.setVisible(false);
 			}
 		});
-		btnWelcomeViewSearch.setBounds(304, 317, 281, 61);
-		JPWelcome.add(btnWelcomeViewSearch);
-		
-		JButton btnSearchResults = new JButton(" Search Results");
+		btnWelcomeViewResults.setBounds(304, 317, 281, 61);
+		JPWelcome.add(btnWelcomeViewResults);
+
+		// Search Results button on Welcome panel makes Search panel visible
+		JButton btnSearchResults = new JButton("Search Results");
 		btnSearchResults.setFont(new Font("Tahoma", Font.PLAIN, 42));
+		btnSearchResults.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JPSearch.setVisible(true);
+				JPWelcome.setVisible(false);
+			}
+		});
 		btnSearchResults.setBounds(286, 416, 317, 61);
 		JPWelcome.add(btnSearchResults);
 
@@ -257,19 +212,19 @@ public class SystemGUI {
 		JPEnterResults.add(lblResults);
 
 		// Labels and Text Fields for Input of Match Result
-		JLabel label = new JLabel("Select Match Number");
-		label.setFont(new Font("Tahoma", Font.PLAIN, 42));
-		label.setBounds(35, 130, 408, 69);
-		JPEnterResults.add(label);		
+		JLabel lblEnterMatchNumber = new JLabel("Enter Match Number:");
+		lblEnterMatchNumber.setFont(new Font("Tahoma", Font.PLAIN, 42));
+		lblEnterMatchNumber.setBounds(240, 130, 408, 69);
+		JPEnterResults.add(lblEnterMatchNumber);
 		JLabel lblOr = new JLabel("or");
 		lblOr.setFont(new Font("Tahoma", Font.PLAIN, 42));
-		lblOr.setBounds(205, 200, 38, 51);
+		lblOr.setBounds(425, 287, 38, 51);
 		JPEnterResults.add(lblOr);
 
 		MatchNumberTextField = new JTextField();
 		MatchNumberTextField.setFont(new Font("Tahoma", Font.PLAIN, 21));
 		MatchNumberTextField.setColumns(10);
-		MatchNumberTextField.setBounds(453, 136, 89, 63);
+		MatchNumberTextField.setBounds(661, 142, 89, 63);
 		JPEnterResults.add(MatchNumberTextField);
 
 		// Text Areas for display of team names on Match Result Panel
@@ -299,27 +254,22 @@ public class SystemGUI {
 				// Assign team names in text areas of Enter Match Results
 				Team1TextArea.append(teamFinder.TeamA(MatchID));
 				Team2TextArea.append(teamFinder.TeamB(MatchID));
-				
+
 				// reset visibility
 				JPEnterResults.setVisible(false);
 				JPEnterMatchResult.setVisible(true);
+				MatchNumberTextField.setText("");
 
 			}
 		});
-		btnSubmitMatch.setBounds(559, 135, 158, 59);
+		btnSubmitMatch.setBounds(369, 202, 158, 59);
 		JPEnterResults.add(btnSubmitMatch);
 
 		// Labels and Text Fields for Input of Round Result
-		JLabel lblSelectRoundNumber = new JLabel("Select Round Number");
+		JLabel lblSelectRoundNumber = new JLabel("Select Round File");
 		lblSelectRoundNumber.setFont(new Font("Tahoma", Font.PLAIN, 42));
-		lblSelectRoundNumber.setBounds(35, 245, 408, 69);
+		lblSelectRoundNumber.setBounds(295, 350, 318, 51);
 		JPEnterResults.add(lblSelectRoundNumber);
-
-		RoundNumberTextField = new JTextField();
-		RoundNumberTextField.setFont(new Font("Tahoma", Font.PLAIN, 21));
-		RoundNumberTextField.setColumns(10);
-		RoundNumberTextField.setBounds(456, 251, 89, 63);
-		JPEnterResults.add(RoundNumberTextField);
 
 		JButton btnsubmitRound = new JButton("submit");
 		btnsubmitRound.setFont(new Font("Tahoma", Font.PLAIN, 42));
@@ -327,7 +277,7 @@ public class SystemGUI {
 			public void actionPerformed(ActionEvent e) {
 
 				JPWelcome.setVisible(false);
-				
+
 				// Filechooser for Round Results
 				JFileChooser JFCRoundResult = new JFileChooser();
 				JFCRoundResult.setBounds(0, 0, 438, 241);
@@ -345,15 +295,16 @@ public class SystemGUI {
 					JPWelcome.setVisible(true);
 				}
 
-				//Write file into database
-				
+				// Write file into database
+
 				try {
-					//update the Results Table
+					// update the Results Table
 					Results resultsOfRound;
 					resultsOfRound = new ResultsOfRound(RoundResultFile);
+					// TODO Validate format of RoundResultsFile
 					resultsOfRound.WriteResult();
-					
-					//update the League Table
+
+					// update the League Table
 					for (int i = 0; i < 3; i++) {
 
 						int row = i;
@@ -373,10 +324,10 @@ public class SystemGUI {
 
 					e1.printStackTrace();
 				}
-	
+
 			}
 		});
-		btnsubmitRound.setBounds(557, 250, 158, 59);
+		btnsubmitRound.setBounds(369, 434, 158, 59);
 		JPEnterResults.add(btnsubmitRound);
 
 		// Home from Enter Results Panel
@@ -390,7 +341,7 @@ public class SystemGUI {
 		btnHomeFromEnterResults.setFont(new Font("Tahoma", Font.PLAIN, 21));
 		btnHomeFromEnterResults.setBounds(693, 451, 123, 42);
 		JPEnterResults.add(btnHomeFromEnterResults);
-		
+
 		// CODE FOR MATCH RESULT PANEL
 
 		// Match Result panel and its labels
@@ -448,32 +399,35 @@ public class SystemGUI {
 		btnSubmitMatchResult.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				// Assign user input data to variables 
+				// Assign user input data to variables
 				int row = 0;
 				int APoints = Integer.parseInt(Team1PointsTextField.getText());
 				int ATries = Integer.parseInt(Team1TriesTextField.getText());
-				int BPoints = Integer.parseInt(Team2PointsTextField.getText()); 
+				int BPoints = Integer.parseInt(Team2PointsTextField.getText());
 				int BTries = Integer.parseInt(Team2TriesTextField.getText());
-				
-				//Feed variables to Results constructor
+
+				// Feed variables to Results constructor
 				Results resultsOfMatch = new ResultsOfMatch(MatchID, APoints, ATries, BPoints, BTries);
 				resultsOfMatch.WriteResult();
-				
-				//Feed resultOfMatch data to Team constructors
-				Team A = new TeamA(resultsOfMatch, row, resultsOfMatch.ReturnResult()[row][1], 
-									resultsOfMatch.ReturnResult()[row][2], 
-									resultsOfMatch.ReturnResult()[row][3]);
-				Team B = new TeamB(resultsOfMatch, row, resultsOfMatch.ReturnResult()[row][3], 
-									resultsOfMatch.ReturnResult()[row][4], 
-									resultsOfMatch.ReturnResult()[row][1]);
+
+				// Feed resultOfMatch data to Team constructors
+				Team A = new TeamA(resultsOfMatch, row, resultsOfMatch.ReturnResult()[row][1],
+						resultsOfMatch.ReturnResult()[row][2], resultsOfMatch.ReturnResult()[row][3]);
+				Team B = new TeamB(resultsOfMatch, row, resultsOfMatch.ReturnResult()[row][3],
+						resultsOfMatch.ReturnResult()[row][4], resultsOfMatch.ReturnResult()[row][1]);
 
 				LeagueTable leagueTable = new LeagueTable(resultsOfMatch, row, A, B);
-				leagueTable.WriteMatchUpdate();	
-				
-				//reset visibility
+				leagueTable.WriteMatchUpdate();
+
+				// reset visibility
 				JPEnterMatchResult.setVisible(false);
 				JPWelcome.setVisible(true);
-				
+				Team1TextArea.setText("");
+				Team2TextArea.setText("");
+				Team1PointsTextField.setText("");
+				Team2PointsTextField.setText("");
+				Team1TriesTextField.setText("");
+				Team2TriesTextField.setText("");
 			}
 		});
 		btnSubmitMatchResult.setBounds(366, 396, 158, 61);
@@ -494,18 +448,19 @@ public class SystemGUI {
 		lblViewSearch.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		lblViewSearch.setBounds(328, 12, 234, 51);
 		JPView.add(lblViewSearch);
-		
+
 		JLabel lblRounds = new JLabel("Rounds");
 		lblRounds.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		lblRounds.setBounds(376, 133, 137, 51);
 		JPView.add(lblRounds);
-		
-		//The View Round Buttons display the respective round query tables in the database
+
+		// The View Round Buttons display the respective round query tables in
+		// the database
 		JButton btnViewRound1 = new JButton("1");
 		btnViewRound1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 1]"); 
+
+				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 1]");
 				databaseTable.Display();
 			}
 		});
@@ -513,24 +468,23 @@ public class SystemGUI {
 		btnViewRound1.setBounds(240, 202, 57, 61);
 		JPView.add(btnViewRound1);
 
-
 		JButton btnViewRound2 = new JButton("2");
 		btnViewRound2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 2]"); 
+
+				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 2]");
 				databaseTable.Display();
 			}
 		});
 		btnViewRound2.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		btnViewRound2.setBounds(328, 202, 57, 61);
 		JPView.add(btnViewRound2);
-		
+
 		JButton btnViewRound3 = new JButton("3");
 		btnViewRound3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 3]"); 
+
+				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 3]");
 				databaseTable.Display();
 			}
 		});
@@ -541,8 +495,8 @@ public class SystemGUI {
 		JButton btnViewRound4 = new JButton("4");
 		btnViewRound4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 4]"); 
+
+				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 4]");
 				databaseTable.Display();
 			}
 		});
@@ -553,8 +507,8 @@ public class SystemGUI {
 		JButton btnViewRound5 = new JButton("5");
 		btnViewRound5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 5]"); 
+
+				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [Round 5]");
 				databaseTable.Display();
 			}
 		});
@@ -569,71 +523,69 @@ public class SystemGUI {
 		btnViewLeagueTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [League Table Query]"); 
+				DatabaseTable databaseTable = new DatabaseTable("SELECT * FROM [League Table Query]");
 				databaseTable.Display();
 
 			}
 		});
 		JPView.add(btnViewLeagueTable);
-		
+
 		JButton btnGrandSlam = new JButton("Grand Slam");
 		btnGrandSlam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				GrandSlam grandSlam = new GrandSlam();
 				grandSlam.Points(grandSlam.Team());
-				
-				if (grandSlam.Team() != 0){
-					
+
+				if (grandSlam.Team() != 0) {
+
 					TeamFinder tf = new TeamFinder();
-					
+
 					JOptionPane.showMessageDialog(null, "THE GRAND SLAM WINNER IS. . . " + tf.Team(grandSlam.Team()));
-					
-				} else 
-					
+
+				} else
+
 					JOptionPane.showMessageDialog(null, "NO GRAND SLAM WINNER");
-					
-				
+
 			}
 		});
 		btnGrandSlam.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		btnGrandSlam.setBounds(304, 447, 282, 61);
 		JPView.add(btnGrandSlam);
 
-
 		// return home from View panel
-		JButton btnHomeFromViewSearch = new JButton("Home");
-		btnHomeFromViewSearch.setFont(new Font("Tahoma", Font.PLAIN, 21));
-		btnHomeFromViewSearch.addActionListener(new ActionListener() {
+		JButton btnHomeFromView = new JButton("Home");
+		btnHomeFromView.setFont(new Font("Tahoma", Font.PLAIN, 21));
+		btnHomeFromView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JPView.setVisible(false);
 				JPWelcome.setVisible(true);
 			}
 		});
-		btnHomeFromViewSearch.setBounds(755, 505, 123, 42);
-		JPView.add(btnHomeFromViewSearch);
-		
-		//CODE FOR SEARCH PANEL 
-		
-		//Search Panel and its Label
-		JPSearch.setLayout(null);	
+		btnHomeFromView.setBounds(755, 505, 123, 42);
+		JPView.add(btnHomeFromView);
+
+		// CODE FOR SEARCH PANEL
+
+		// Search Panel and its Label
+		JPSearch.setLayout(null);
 		JLabel lblEnterSqlQuery = new JLabel("Enter SQL Query: ");
 		lblEnterSqlQuery.setBounds(283, 124, 337, 51);
 		JPSearch.add(lblEnterSqlQuery);
 		lblEnterSqlQuery.setFont(new Font("Tahoma", Font.PLAIN, 42));
-				
+
 		JLabel lblSearchResults = new JLabel("Search Results");
 		lblSearchResults.setBounds(310, 31, 270, 51);
 		lblSearchResults.setFont(new Font("Tahoma", Font.PLAIN, 42));
 		JPSearch.add(lblSearchResults);
-		
-		//TextField for user input of SQL query 
+
+		// TextField for user input of SQL query
 		SQLTextField = new JTextField();
 		SQLTextField.setBounds(55, 262, 785, 30);
 		JPSearch.add(SQLTextField);
 		SQLTextField.setFont(new Font("Tahoma", Font.PLAIN, 21));
 		SQLTextField.setColumns(10);
-				
+
 		// Submit SQL query button
 		JButton btnSubmitQuery = new JButton("submit query");
 		btnSubmitQuery.setBounds(305, 355, 275, 61);
@@ -641,12 +593,25 @@ public class SystemGUI {
 		btnSubmitQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				DatabaseTable databaseTable = new DatabaseTable(SQLTextField.getText()); 
+				DatabaseTable databaseTable = new DatabaseTable(SQLTextField.getText());
 				databaseTable.Display();
 
 			}
-		});
+		});	
 		btnSubmitQuery.setFont(new Font("Tahoma", Font.PLAIN, 42));
+
+		//Home to Welcome Panel from Search Panel
+		btnHomeFromSearch = new JButton("Home");
+		btnHomeFromSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				JPSearch.setVisible(false);
+				JPWelcome.setVisible(true);
+			}
+		});
+		btnHomeFromSearch.setFont(new Font("Tahoma", Font.PLAIN, 21));
+		btnHomeFromSearch.setBounds(729, 467, 123, 42);
+		JPSearch.add(btnHomeFromSearch);
 
 	}
 }

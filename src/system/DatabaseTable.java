@@ -71,7 +71,7 @@ public class DatabaseTable {
 			        frame.getContentPane().setLayout(new BorderLayout());		 
 			        frame.getContentPane().add(lblHeading,BorderLayout.PAGE_START);
 			        frame.getContentPane().add(scrollPane,BorderLayout.CENTER);
-			        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			 
 			        frame.setSize(550, 200);
 			        frame.setVisible(true);
 					
