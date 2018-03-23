@@ -24,7 +24,7 @@ public class GrandSlam {
 				
 					while(rs.next()){
 						
-						if (rs.getInt(2) == 6){
+						if (rs.getInt(2) == 5){
 							
 							TeamNo = rs.getInt(1);
 						}						
