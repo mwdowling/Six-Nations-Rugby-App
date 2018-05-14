@@ -18,7 +18,6 @@ public class FixtureAssignment {
 
 	private List<String> TeamsShuffled = new ArrayList<String>();
 
-
 	public FixtureAssignment(ArrayList<String> teamsShuffled) {
 		TeamsShuffled = teamsShuffled;
 

@@ -28,8 +28,7 @@ public class LeagueTable {
 		Row = row;
 		MatchID = R.ReturnResult()[Row][0];
 		A = a;
-		B = b;
-		
+		B = b;	
 	}
 
 	public void WriteMatchUpdate() {

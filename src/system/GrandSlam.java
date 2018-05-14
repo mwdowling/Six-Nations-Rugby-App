@@ -13,7 +13,7 @@ public class GrandSlam {
 	
 	}
 
-	//returns Team Number of a Team with six wins or 0
+	//returns Team Number of a Team with 5 wins or 0
 	public int Team() {
 
 		int TeamNo = 0; 
